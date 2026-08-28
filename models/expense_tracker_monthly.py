@@ -57,10 +57,10 @@ class ExpenseTrackerMonthly(models.Model):
     approved_date = fields.Datetime(string='Approved On', readonly=True, copy=False)
     return_reason = fields.Text(string='Return Reason', readonly=True, copy=False)
 
-    _sql_constraints = [
-        ('city_month_year_uniq', 'unique(city_id, month, year, company_id)',
-         'A monthly record for this City and Month already exists!'),
-    ]
+    _city_month_year_uniq = models.Constraint(
+        'unique(city_id, month, year, company_id)',
+        'A monthly record for this City and Month already exists!',
+    )
 
     def _default_city_id(self):
         cities = self.env['expense.tracker.city'].search([('user_ids', 'in', self.env.user.id)], limit=2)

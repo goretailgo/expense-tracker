@@ -14,26 +14,27 @@ class ExpenseTrackerCity(models.Model):
         'res.company', string='Company', default=lambda self: self.env.company)
 
     manager_id = fields.Many2one(
-        'res.users', string='Manager', required=True, tracking=True,
+        'res.users', string='Manager', required=True,
         domain=lambda self: [
-            ('groups_id', 'in', self.env.ref('expense_tracker.group_expense_manager').ids)
+            ('group_ids', 'in', self.env.ref('expense_tracker.group_expense_manager').ids)
         ],
         help="A manager can be assigned to more than one city.")
 
     user_ids = fields.Many2many(
         'res.users', 'expense_tracker_city_user_rel', 'city_id', 'user_id',
-        string='City Users', tracking=True,
+        string='City Users',
         domain=lambda self: [
-            ('groups_id', 'in', self.env.ref('expense_tracker.group_expense_city_user').ids)
+            ('group_ids', 'in', self.env.ref('expense_tracker.group_expense_city_user').ids)
         ],
         help="Users who can create and view monthly records for this city.")
 
     monthly_ids = fields.One2many('expense.tracker.monthly', 'city_id', string='Monthly Records')
     monthly_count = fields.Integer(compute='_compute_monthly_count')
 
-    _sql_constraints = [
-        ('code_company_uniq', 'unique(code, company_id)', 'City code must be unique per company!'),
-    ]
+    _code_company_uniq = models.Constraint(
+        'unique(code, company_id)',
+        'City code must be unique per company!',
+    )
 
     @api.depends('monthly_ids')
     def _compute_monthly_count(self):

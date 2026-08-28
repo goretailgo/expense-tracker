@@ -20,7 +20,7 @@ class ExpenseTrackerCategory(models.Model):
     company_id = fields.Many2one(
         'res.company', string='Company', default=lambda self: self.env.company)
 
-    _sql_constraints = [
-        ('name_type_company_uniq', 'unique(name, type, company_id)',
-         'A category with this name and type already exists!'),
-    ]
+    _name_type_company_uniq = models.Constraint(
+        'unique(name, type, company_id)',
+        'A category with this name and type already exists!',
+    )
