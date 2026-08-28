@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_expense_tracker_city_list" model="ir.ui.view">
+        <field name="name">expense.tracker.city.list</field>
+        <field name="model">expense.tracker.city</field>
+        <field name="arch" type="xml">
+            <list string="Cities">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="manager_id"/>
+                <field name="user_ids" widget="many2many_tags"/>
+                <field name="monthly_count" string="Records"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_expense_tracker_city_form" model="ir.ui.view">
+        <field name="name">expense.tracker.city.form</field>
+        <field name="model">expense.tracker.city</field>
+        <field name="arch" type="xml">
+            <form string="City">
+                <header/>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_monthly_records" type="object"
+                                class="oe_stat_button" icon="fa-book">
+                            <field name="monthly_count" widget="statinfo" string="Monthly Records"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="manager_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="City Users">
+                        <field name="user_ids" nolabel="1" widget="many2many_tags"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_expense_tracker_city" model="ir.actions.act_window">
+        <field name="name">Cities</field>
+        <field name="res_model">expense.tracker.city</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first city</p>
+            <p>Assign a Manager and City Users to each city. A manager can be
+               assigned to more than one city.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Default Income categories -->
+    <record id="category_income_sales" model="expense.tracker.category">
+        <field name="name">Sales Income</field>
+        <field name="type">income</field>
+        <field name="sequence">10</field>
+        <field name="is_default">True</field>
+    </record>
+    <record id="category_income_other" model="expense.tracker.category">
+        <field name="name">Other Income</field>
+        <field name="type">income</field>
+        <field name="sequence">20</field>
+        <field name="is_default">True</field>
+    </record>
+
+    <!-- Default Expense categories -->
+    <record id="category_expense_rent" model="expense.tracker.category">
+        <field name="name">Rent</field>
+        <field name="type">expense</field>
+        <field name="sequence">10</field>
+        <field name="is_default">True</field>
+    </record>
+    <record id="category_expense_salary" model="expense.tracker.category">
+        <field name="name">Salary / Wages</field>
+        <field name="type">expense</field>
+        <field name="sequence">20</field>
+        <field name="is_default">True</field>
+    </record>
+    <record id="category_expense_electricity" model="expense.tracker.category">
+        <field name="name">Electricity Bill</field>
+        <field name="type">expense</field>
+        <field name="sequence">30</field>
+        <field name="is_default">True</field>
+    </record>
+    <record id="category_expense_water" model="expense.tracker.category">
+        <field name="name">Water Bill</field>
+        <field name="type">expense</field>
+        <field name="sequence">40</field>
+        <field name="is_default">True</field>
+    </record>
+    <record id="category_expense_transport" model="expense.tracker.category">
+        <field name="name">Transport</field>
+        <field name="type">expense</field>
+        <field name="sequence">50</field>
+        <field name="is_default">True</field>
+    </record>
+    <record id="category_expense_maintenance" model="expense.tracker.category">
+        <field name="name">Maintenance</field>
+        <field name="type">expense</field>
+        <field name="sequence">60</field>
+        <field name="is_default">True</field>
+    </record>
+    <record id="category_expense_misc" model="expense.tracker.category">
+        <field name="name">Miscellaneous</field>
+        <field name="type">expense</field>
+        <field name="sequence">70</field>
+        <field name="is_default">False</field>
+    </record>
+
+</odoo>

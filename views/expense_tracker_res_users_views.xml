@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_users_form_expense_tracker" model="ir.ui.view">
+        <field name="name">res.users.form.expense.tracker</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Expense Tracker" name="expense_tracker">
+                    <group>
+                        <group string="City User Assignment">
+                            <field name="expense_tracker_city_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"/>
+                        </group>
+                        <group string="Manager Of" invisible="expense_tracker_managed_city_count == 0">
+                            <field name="managed_city_ids" nolabel="1" readonly="1">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+</odoo>

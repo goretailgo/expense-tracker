@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_expense_tracker_line_report_list" model="ir.ui.view">
+        <field name="name">expense.tracker.line.report.list</field>
+        <field name="model">expense.tracker.line.report</field>
+        <field name="arch" type="xml">
+            <list string="Statement" create="0" edit="0" delete="0"
+                  decoration-success="line_type=='income'" decoration-danger="line_type=='expense'">
+                <field name="manager_id"/>
+                <field name="city_id"/>
+                <field name="month"/>
+                <field name="year"/>
+                <field name="line_type"/>
+                <field name="category_id"/>
+                <field name="description"/>
+                <field name="amount" sum="Total"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_expense_tracker_line_report_search" model="ir.ui.view">
+        <field name="name">expense.tracker.line.report.search</field>
+        <field name="model">expense.tracker.line.report</field>
+        <field name="arch" type="xml">
+            <search string="Statement">
+                <field name="city_id"/>
+                <field name="manager_id"/>
+                <field name="category_id"/>
+                <field name="month"/>
+                <field name="year"/>
+                <filter string="Income" name="filter_income" domain="[('line_type','=','income')]"/>
+                <filter string="Expense" name="filter_expense" domain="[('line_type','=','expense')]"/>
+                <separator/>
+                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Submitted" name="filter_submitted" domain="[('state','=','submitted')]"/>
+                <filter string="Approved" name="filter_approved" domain="[('state','=','approved')]"/>
+                <filter string="Returned" name="filter_returned" domain="[('state','=','returned')]"/>
+                <separator/>
+                <filter string="This Year" name="filter_this_year"
+                        domain="[('year','=', context_today().year)]"/>
+                <group expand="1" string="Group By">
+                    <filter string="Manager" name="groupby_manager" context="{'group_by':'manager_id'}"/>
+                    <filter string="City" name="groupby_city" context="{'group_by':'city_id'}"/>
+                    <filter string="Month" name="groupby_month" context="{'group_by':'month'}"/>
+                    <filter string="Category" name="groupby_category" context="{'group_by':'category_id'}"/>
+                    <filter string="Type" name="groupby_type" context="{'group_by':'line_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_expense_tracker_line_report_pivot" model="ir.ui.view">
+        <field name="name">expense.tracker.line.report.pivot</field>
+        <field name="model">expense.tracker.line.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Statement Drill-Down">
+                <field name="manager_id" type="row"/>
+                <field name="city_id" type="row"/>
+                <field name="month" type="row"/>
+                <field name="category_id" type="row"/>
+                <field name="line_type" type="col"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_expense_tracker_line_report_graph" model="ir.ui.view">
+        <field name="name">expense.tracker.line.report.graph</field>
+        <field name="model">expense.tracker.line.report</field>
+        <field name="arch" type="xml">
+            <graph string="Statement" type="bar">
+                <field name="city_id" type="row"/>
+                <field name="line_type" type="col"/>
+                <field name="amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_expense_tracker_line_report" model="ir.actions.act_window">
+        <field name="name">Statement</field>
+        <field name="res_model">expense.tracker.line.report</field>
+        <field name="view_mode">pivot,list,graph</field>
+        <field name="search_view_id" ref="view_expense_tracker_line_report_search"/>
+        <field name="context">{'search_default_filter_this_year': 1, 'search_default_groupby_manager': 1, 'search_default_groupby_city': 1, 'search_default_groupby_month': 1}</field>
+        <field name="help" type="html">
+            <p>Drill down from Manager to City to Month to individual Income and
+               Expense lines. Read-only; figures always reflect the underlying
+               Income &amp; Expense lines.</p>
+        </field>
+    </record>
+
+</odoo>

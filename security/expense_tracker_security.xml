@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================= Module category ================= -->
+    <record id="module_category_expense_tracker" model="ir.module.category">
+        <field name="name">Expense Tracker</field>
+        <field name="description">Multi-city Income &amp; Expense tracking security</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- ================= Groups (City -> Manager -> Director) ================= -->
+    <record id="group_expense_city_user" model="res.groups">
+        <field name="name">City User</field>
+        <field name="category_id" ref="module_category_expense_tracker"/>
+        <field name="comment">Can create and view Income &amp; Expense records only for their own assigned city/cities.</field>
+    </record>
+
+    <record id="group_expense_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_expense_tracker"/>
+        <field name="implied_ids" eval="[(4, ref('group_expense_city_user'))]"/>
+        <field name="comment">Can view/manage all cities assigned to them, and approve or return submitted records.</field>
+    </record>
+
+    <record id="group_expense_director" model="res.groups">
+        <field name="name">Director</field>
+        <field name="category_id" ref="module_category_expense_tracker"/>
+        <field name="implied_ids" eval="[(4, ref('group_expense_manager'))]"/>
+        <field name="comment">Full visibility across all managers and cities; can reopen approved records and manage master data.</field>
+    </record>
+
+    <!-- ================= Record rules: expense.tracker.city ================= -->
+    <record id="rule_city_city_user" model="ir.rule">
+        <field name="name">Expense Tracker City: City User sees own city/cities only</field>
+        <field name="model_id" ref="model_expense_tracker_city"/>
+        <field name="domain_force">[('user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_expense_city_user'))]"/>
+    </record>
+
+    <record id="rule_city_manager" model="ir.rule">
+        <field name="name">Expense Tracker City: Manager sees assigned cities</field>
+        <field name="model_id" ref="model_expense_tracker_city"/>
+        <field name="domain_force">[('manager_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_expense_manager'))]"/>
+    </record>
+
+    <record id="rule_city_director" model="ir.rule">
+        <field name="name">Expense Tracker City: Director sees all cities</field>
+        <field name="model_id" ref="model_expense_tracker_city"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_expense_director'))]"/>
+    </record>
+
+    <!-- ================= Record rules: expense.tracker.monthly ================= -->
+    <record id="rule_monthly_city_user" model="ir.rule">
+        <field name="name">Expense Tracker Monthly: City User sees own city records</field>
+        <field name="model_id" ref="model_expense_tracker_monthly"/>
+        <field name="domain_force">[('city_id.user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_expense_city_user'))]"/>
+    </record>
+
+    <record id="rule_monthly_manager" model="ir.rule">
+        <field name="name">Expense Tracker Monthly: Manager sees assigned cities' records</field>
+        <field name="model_id" ref="model_expense_tracker_monthly"/>
+        <field name="domain_force">[('city_id.manager_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_expense_manager'))]"/>
+    </record>
+
+    <record id="rule_monthly_director" model="ir.rule">
+        <field name="name">Expense Tracker Monthly: Director sees all records</field>
+        <field name="model_id" ref="model_expense_tracker_monthly"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_expense_director'))]"/>
+    </record>
+
+    <!-- ================= Record rules: expense.tracker.income.line ================= -->
+    <record id="rule_income_line_city_user" model="ir.rule">
+        <field name="name">Expense Tracker Income Line: City User</field>
+        <field name="model_id" ref="model_expense_tracker_income_line"/>
+        <field name="domain_force">[('monthly_id.city_id.user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_expense_city_user'))]"/>
+    </record>
+
+    <record id="rule_income_line_manager" model="ir.rule">
+        <field name="name">Expense Tracker Income Line: Manager</field>
+        <field name="model_id" ref="model_expense_tracker_income_line"/>
+        <field name="domain_force">[('monthly_id.city_id.manager_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_expense_manager'))]"/>
+    </record>
+
+    <record id="rule_income_line_director" model="ir.rule">
+        <field name="name">Expense Tracker Income Line: Director</field>
+        <field name="model_id" ref="model_expense_tracker_income_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_expense_director'))]"/>
+    </record>
+
+    <!-- ================= Record rules: expense.tracker.expense.line ================= -->
+    <record id="rule_expense_line_city_user" model="ir.rule">
+        <field name="name">Expense Tracker Expense Line: City User</field>
+        <field name="model_id" ref="model_expense_tracker_expense_line"/>
+        <field name="domain_force">[('monthly_id.city_id.user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_expense_city_user'))]"/>
+    </record>
+
+    <record id="rule_expense_line_manager" model="ir.rule">
+        <field name="name">Expense Tracker Expense Line: Manager</field>
+        <field name="model_id" ref="model_expense_tracker_expense_line"/>
+        <field name="domain_force">[('monthly_id.city_id.manager_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_expense_manager'))]"/>
+    </record>
+
+    <record id="rule_expense_line_director" model="ir.rule">
+        <field name="name">Expense Tracker Expense Line: Director</field>
+        <field name="model_id" ref="model_expense_tracker_expense_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_expense_director'))]"/>
+    </record>
+
+    <!-- ================= Record rules: expense.tracker.line.report (Statement) ================= -->
+    <record id="rule_line_report_city_user" model="ir.rule">
+        <field name="name">Expense Tracker Statement: City User</field>
+        <field name="model_id" ref="model_expense_tracker_line_report"/>
+        <field name="domain_force">[('city_id.user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_expense_city_user'))]"/>
+    </record>
+
+    <record id="rule_line_report_manager" model="ir.rule">
+        <field name="name">Expense Tracker Statement: Manager</field>
+        <field name="model_id" ref="model_expense_tracker_line_report"/>
+        <field name="domain_force">[('manager_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_expense_manager'))]"/>
+    </record>
+
+    <record id="rule_line_report_director" model="ir.rule">
+        <field name="name">Expense Tracker Statement: Director</field>
+        <field name="model_id" ref="model_expense_tracker_line_report"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_expense_director'))]"/>
+    </record>
+
+</odoo>

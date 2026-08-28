@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_expense_tracker_category_list" model="ir.ui.view">
+        <field name="name">expense.tracker.category.list</field>
+        <field name="model">expense.tracker.category</field>
+        <field name="arch" type="xml">
+            <list string="Categories" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="type"/>
+                <field name="is_default"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_expense_tracker_category_search" model="ir.ui.view">
+        <field name="name">expense.tracker.category.search</field>
+        <field name="model">expense.tracker.category</field>
+        <field name="arch" type="xml">
+            <search string="Categories">
+                <field name="name"/>
+                <filter string="Income" name="filter_income" domain="[('type','=','income')]"/>
+                <filter string="Expense" name="filter_expense" domain="[('type','=','expense')]"/>
+                <separator/>
+                <filter string="Default Lines" name="filter_default" domain="[('is_default','=',True)]"/>
+                <filter string="Archived" name="filter_archived" domain="[('active','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="groupby_type" context="{'group_by':'type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_expense_tracker_category" model="ir.actions.act_window">
+        <field name="name">Categories</field>
+        <field name="res_model">expense.tracker.category</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_expense_tracker_category_search"/>
+        <field name="context">{'search_default_filter_income': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create an Income or Expense category</p>
+            <p>Categories marked "Add by Default" are automatically added as a line
+               to every new monthly record. Users can still add or remove lines
+               freely on the record itself.</p>
+        </field>
+    </record>
+
+</odoo>

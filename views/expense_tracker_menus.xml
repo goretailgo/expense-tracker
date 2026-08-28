@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_expense_tracker_root" name="Expense Tracker"
+              web_icon="expense_tracker,static/description/icon.png"
+              groups="expense_tracker.group_expense_city_user"
+              sequence="60"/>
+
+    <menuitem id="menu_expense_tracker_monthly" name="Monthly Records"
+              parent="menu_expense_tracker_root"
+              action="action_expense_tracker_monthly"
+              groups="expense_tracker.group_expense_city_user"
+              sequence="10"/>
+
+    <menuitem id="menu_expense_tracker_approvals" name="Approvals"
+              parent="menu_expense_tracker_root"
+              action="action_expense_tracker_monthly_approvals"
+              groups="expense_tracker.group_expense_manager"
+              sequence="20"/>
+
+    <menuitem id="menu_expense_tracker_statement" name="Statement"
+              parent="menu_expense_tracker_root"
+              action="action_expense_tracker_line_report"
+              groups="expense_tracker.group_expense_city_user"
+              sequence="30"/>
+
+    <menuitem id="menu_expense_tracker_configuration" name="Configuration"
+              parent="menu_expense_tracker_root"
+              groups="expense_tracker.group_expense_director"
+              sequence="90"/>
+
+    <menuitem id="menu_expense_tracker_cities" name="Cities"
+              parent="menu_expense_tracker_configuration"
+              action="action_expense_tracker_city"
+              groups="expense_tracker.group_expense_director"
+              sequence="10"/>
+
+    <menuitem id="menu_expense_tracker_categories" name="Categories"
+              parent="menu_expense_tracker_configuration"
+              action="action_expense_tracker_category"
+              groups="expense_tracker.group_expense_director"
+              sequence="20"/>
+
+</odoo>
