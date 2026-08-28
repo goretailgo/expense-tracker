@@ -26,7 +26,8 @@
                 <separator/>
                 <filter string="Default Lines" name="filter_default" domain="[('is_default','=',True)]"/>
                 <filter string="Archived" name="filter_archived" domain="[('active','=',False)]"/>
-                <group expand="0" string="Group By">
+                <separator string="Group By"/>
+                <group>
                     <filter string="Type" name="groupby_type" context="{'group_by':'type'}"/>
                 </group>
             </search>

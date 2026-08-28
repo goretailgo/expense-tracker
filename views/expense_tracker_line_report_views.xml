@@ -40,7 +40,8 @@
                 <separator/>
                 <filter string="This Year" name="filter_this_year"
                         domain="[('year','=', context_today().year)]"/>
-                <group expand="1" string="Group By">
+                <separator string="Group By"/>
+                <group>
                     <filter string="Manager" name="groupby_manager" context="{'group_by':'manager_id'}"/>
                     <filter string="City" name="groupby_city" context="{'group_by':'city_id'}"/>
                     <filter string="Month" name="groupby_month" context="{'group_by':'month'}"/>
