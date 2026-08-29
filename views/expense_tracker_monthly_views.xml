@@ -1,33 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- ================= Income / Expense line forms (used as the
-         "Add Income" / "Add Expense" popup, and when clicking an
-         existing line to edit it) ================= -->
-    <record id="view_expense_tracker_income_line_form" model="ir.ui.view">
-        <field name="name">expense.tracker.income.line.form</field>
-        <field name="model">expense.tracker.income.line</field>
+    <!-- ================= Entry popup form (used for "Add Entry" and for
+         opening an existing Income/Expense line to edit it). One shared
+         form for both types - the Type field drives which categories are
+         offered. ================= -->
+    <record id="view_expense_tracker_line_form" model="ir.ui.view">
+        <field name="name">expense.tracker.line.form</field>
+        <field name="model">expense.tracker.line</field>
         <field name="arch" type="xml">
-            <form string="Income Entry">
+            <form string="Income / Expense Entry">
                 <group>
-                    <field name="category_id"/>
-                    <field name="date"/>
-                    <field name="description"/>
-                    <field name="amount"/>
-                    <field name="currency_id" invisible="1"/>
-                    <field name="monthly_id" invisible="1"/>
-                </group>
-            </form>
-        </field>
-    </record>
-
-    <record id="view_expense_tracker_expense_line_form" model="ir.ui.view">
-        <field name="name">expense.tracker.expense.line.form</field>
-        <field name="model">expense.tracker.expense.line</field>
-        <field name="arch" type="xml">
-            <form string="Expense Entry">
-                <group>
-                    <field name="category_id"/>
+                    <field name="line_type" widget="radio" options="{'horizontal': true}"/>
+                    <field name="category_id" domain="[('type', '=', line_type)]" options="{'no_create': True}"/>
                     <field name="date"/>
                     <field name="description"/>
                     <field name="amount"/>
@@ -47,7 +32,7 @@
                 <field name="city_id"/>
                 <field name="manager_id"/>
                 <field name="month"/>
-                <field name="year"/>
+                <field name="year" options="{'enable_formatting': false}"/>
                 <field name="total_income" sum="Total"/>
                 <field name="total_expense" sum="Total"/>
                 <field name="net_income" sum="Total"/>
@@ -69,7 +54,7 @@
                         <group>
                             <field name="city_id" options="{'no_create': True}"/>
                             <field name="month"/>
-                            <field name="year"/>
+                            <field name="year" options="{'enable_formatting': false}"/>
                         </group>
                         <group>
                             <field name="manager_id" readonly="1"/>
@@ -77,32 +62,23 @@
                             <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
-                    <notebook>
-                        <page string="Income" name="income">
-                            <field name="income_line_ids" nolabel="1" add-label="Add Income">
-                                <list>
-                                    <field name="sequence" widget="handle"/>
-                                    <field name="date"/>
-                                    <field name="category_id"/>
-                                    <field name="description"/>
-                                    <field name="amount" sum="Total Income"/>
-                                    <field name="currency_id" column_invisible="1"/>
-                                </list>
-                            </field>
-                        </page>
-                        <page string="Expense" name="expense">
-                            <field name="expense_line_ids" nolabel="1" add-label="Add Expense">
-                                <list>
-                                    <field name="sequence" widget="handle"/>
-                                    <field name="date"/>
-                                    <field name="category_id"/>
-                                    <field name="description"/>
-                                    <field name="amount" sum="Total Expense"/>
-                                    <field name="currency_id" column_invisible="1"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
+                    <group>
+                        <field name="line_filter" widget="radio" options="{'horizontal': true}"/>
+                    </group>
+                    <field name="line_ids" nolabel="1" add-label="Add Entry"
+                           domain="[('line_type', '=', line_filter)] if line_filter != 'all' else []">
+                        <list>
+                            <field name="sequence" widget="handle"/>
+                            <field name="date"/>
+                            <field name="line_type" widget="badge"
+                                   decoration-success="line_type == 'income'"
+                                   decoration-danger="line_type == 'expense'"/>
+                            <field name="category_id"/>
+                            <field name="description"/>
+                            <field name="amount" sum="Total"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
                     <group class="oe_subtotal_footer oe_right">
                         <field name="total_income"/>
                         <field name="total_expense"/>
@@ -125,10 +101,8 @@
                 <field name="manager_id"/>
                 <field name="month"/>
                 <field name="year"/>
-                <field name="income_line_ids" string="Income Category"
-                       filter_domain="[('income_line_ids.category_id.name','ilike',self)]"/>
-                <field name="expense_line_ids" string="Expense Category"
-                       filter_domain="[('expense_line_ids.category_id.name','ilike',self)]"/>
+                <field name="line_ids" string="Category"
+                       filter_domain="[('line_ids.category_id.name','ilike',self)]"/>
                 <separator/>
                 <filter string="This Year" name="filter_this_year"
                         domain="[('year','=', context_today().year)]"/>

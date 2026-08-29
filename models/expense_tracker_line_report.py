@@ -43,33 +43,13 @@ class ExpenseTrackerLineReport(models.Model):
                     m.month AS month,
                     m.year AS year,
                     l.category_id AS category_id,
-                    'income' AS line_type,
+                    l.line_type AS line_type,
                     l.date AS date,
                     l.description AS description,
                     l.amount AS amount,
                     m.currency_id AS currency_id,
                     m.company_id AS company_id
-                FROM expense_tracker_income_line l
-                JOIN expense_tracker_monthly m ON m.id = l.monthly_id
-                JOIN expense_tracker_city c ON c.id = m.city_id
-
-                UNION ALL
-
-                SELECT
-                    (l.id + 1000000000) AS id,
-                    l.monthly_id AS monthly_id,
-                    m.city_id AS city_id,
-                    c.manager_id AS manager_id,
-                    m.month AS month,
-                    m.year AS year,
-                    l.category_id AS category_id,
-                    'expense' AS line_type,
-                    l.date AS date,
-                    l.description AS description,
-                    l.amount AS amount,
-                    m.currency_id AS currency_id,
-                    m.company_id AS company_id
-                FROM expense_tracker_expense_line l
+                FROM expense_tracker_line l
                 JOIN expense_tracker_monthly m ON m.id = l.monthly_id
                 JOIN expense_tracker_city c ON c.id = m.city_id
             )

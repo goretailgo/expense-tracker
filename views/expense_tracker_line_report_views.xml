@@ -10,7 +10,7 @@
                 <field name="manager_id"/>
                 <field name="city_id"/>
                 <field name="month"/>
-                <field name="year"/>
+                <field name="year" options="{'enable_formatting': false}"/>
                 <field name="date"/>
                 <field name="line_type"/>
                 <field name="category_id"/>
