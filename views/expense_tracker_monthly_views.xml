@@ -48,7 +48,7 @@
         <field name="name">expense.tracker.monthly.form</field>
         <field name="model">expense.tracker.monthly</field>
         <field name="arch" type="xml">
-            <form string="Monthly Income &amp; Expense" create="false">
+            <form string="Monthly Income &amp; Expense" create="false" delete="false">
                 <sheet>
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
@@ -68,6 +68,9 @@
                     <div class="mb-2">
                         <button name="action_add_line" type="object" string="Add Entry"
                                 class="btn btn-success" icon="fa-plus"/>
+                        <button name="action_delete_and_redirect" type="object" string="Delete"
+                                class="btn btn-outline-danger ms-2" icon="fa-trash"
+                                confirm="Delete this monthly record and all its entries? This cannot be undone."/>
                     </div>
                     <field name="line_ids" nolabel="1" default_group_by="line_type">
                         <list create="0">

@@ -110,6 +110,19 @@ class ExpenseTrackerMonthly(models.Model):
         day = min(today.day, last_day) if today.year == year and today.month == month else last_day
         return today.replace(year=year, month=month, day=day)
 
+    def action_delete_and_redirect(self):
+        """Delete this record and go back to the list, instead of Odoo's
+        default behaviour of jumping to the next/previous record in the
+        current set. Pairs with delete="false" on the form view, which
+        hides the generic gear-menu Delete (which doesn't redirect this
+        way) so this button is the only way to delete from the form."""
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id('expense_tracker.action_expense_tracker_monthly')
+        self.unlink()
+        action['view_mode'] = 'list,form'
+        action.pop('res_id', None)
+        return action
+
     def action_add_line(self):
         """Open the entry popup (Type/Category/Date/Description/Amount) - the
         single 'Add Entry' button below Year replaces the default 'Add a
