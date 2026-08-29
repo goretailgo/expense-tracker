@@ -66,7 +66,7 @@
                         <field name="line_filter" widget="radio" options="{'horizontal': true}"/>
                     </group>
                     <field name="line_ids" nolabel="1" add-label="Add Entry"
-                           domain="[('line_type', '=', line_filter)] if line_filter != 'all' else []">
+                           domain="[('line_type', 'in', ['income', 'expense'] if line_filter == 'all' else [line_filter])]">
                         <list>
                             <field name="sequence" widget="handle"/>
                             <field name="date"/>
