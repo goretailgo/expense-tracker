@@ -12,17 +12,11 @@
               groups="expense_tracker.group_expense_city_user"
               sequence="10"/>
 
-    <menuitem id="menu_expense_tracker_approvals" name="Approvals"
-              parent="menu_expense_tracker_root"
-              action="action_expense_tracker_monthly_approvals"
-              groups="expense_tracker.group_expense_manager"
-              sequence="20"/>
-
     <menuitem id="menu_expense_tracker_statement" name="Statement"
               parent="menu_expense_tracker_root"
               action="action_expense_tracker_line_report"
               groups="expense_tracker.group_expense_city_user"
-              sequence="30"/>
+              sequence="20"/>
 
     <menuitem id="menu_expense_tracker_configuration" name="Configuration"
               parent="menu_expense_tracker_root"

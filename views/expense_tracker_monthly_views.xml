@@ -1,14 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- ================= Income / Expense line forms (used as the
+         "Add Income" / "Add Expense" popup, and when clicking an
+         existing line to edit it) ================= -->
+    <record id="view_expense_tracker_income_line_form" model="ir.ui.view">
+        <field name="name">expense.tracker.income.line.form</field>
+        <field name="model">expense.tracker.income.line</field>
+        <field name="arch" type="xml">
+            <form string="Income Entry">
+                <group>
+                    <field name="category_id"/>
+                    <field name="date"/>
+                    <field name="description"/>
+                    <field name="amount"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="monthly_id" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_expense_tracker_expense_line_form" model="ir.ui.view">
+        <field name="name">expense.tracker.expense.line.form</field>
+        <field name="model">expense.tracker.expense.line</field>
+        <field name="arch" type="xml">
+            <form string="Expense Entry">
+                <group>
+                    <field name="category_id"/>
+                    <field name="date"/>
+                    <field name="description"/>
+                    <field name="amount"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="monthly_id" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
     <!-- ================= List ================= -->
     <record id="view_expense_tracker_monthly_list" model="ir.ui.view">
         <field name="name">expense.tracker.monthly.list</field>
         <field name="model">expense.tracker.monthly</field>
         <field name="arch" type="xml">
-            <list string="Monthly Income &amp; Expense" decoration-muted="state=='draft'"
-                  decoration-info="state=='submitted'" decoration-success="state=='approved'"
-                  decoration-danger="state=='returned'">
+            <list string="Monthly Income &amp; Expense">
                 <field name="city_id"/>
                 <field name="manager_id"/>
                 <field name="month"/>
@@ -16,9 +51,6 @@
                 <field name="total_income" sum="Total"/>
                 <field name="total_expense" sum="Total"/>
                 <field name="net_income" sum="Total"/>
-                <field name="state" widget="badge"
-                       decoration-muted="state=='draft'" decoration-info="state=='submitted'"
-                       decoration-success="state=='approved'" decoration-danger="state=='returned'"/>
             </list>
         </field>
     </record>
@@ -29,34 +61,15 @@
         <field name="model">expense.tracker.monthly</field>
         <field name="arch" type="xml">
             <form string="Monthly Income &amp; Expense">
-                <header>
-                    <button name="action_submit" type="object" string="Submit"
-                            class="btn-primary"
-                            invisible="state not in ('draft','returned')"/>
-                    <button name="action_approve" type="object" string="Approve"
-                            class="btn-primary"
-                            groups="expense_tracker.group_expense_manager"
-                            invisible="state != 'submitted'"/>
-                    <button name="action_open_return_wizard" type="object"
-                            string="Return for Correction"
-                            groups="expense_tracker.group_expense_manager"
-                            invisible="state != 'submitted'"/>
-                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
-                            groups="expense_tracker.group_expense_director"
-                            invisible="state != 'approved'"
-                            confirm="Reopening this record will move it back to Draft. Continue?"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
-                </header>
                 <sheet>
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
                     </div>
                     <group>
                         <group>
-                            <field name="city_id" options="{'no_create': True}"
-                                   readonly="state != 'draft'"/>
-                            <field name="month" readonly="state != 'draft'"/>
-                            <field name="year" readonly="state != 'draft'"/>
+                            <field name="city_id" options="{'no_create': True}"/>
+                            <field name="month"/>
+                            <field name="year"/>
                         </group>
                         <group>
                             <field name="manager_id" readonly="1"/>
@@ -66,10 +79,10 @@
                     </group>
                     <notebook>
                         <page string="Income" name="income">
-                            <field name="income_line_ids" nolabel="1"
-                                   readonly="state in ('submitted','approved')">
-                                <list editable="bottom" add-label="Add Income">
+                            <field name="income_line_ids" nolabel="1" add-label="Add Income">
+                                <list>
                                     <field name="sequence" widget="handle"/>
+                                    <field name="date"/>
                                     <field name="category_id"/>
                                     <field name="description"/>
                                     <field name="amount" sum="Total Income"/>
@@ -78,10 +91,10 @@
                             </field>
                         </page>
                         <page string="Expense" name="expense">
-                            <field name="expense_line_ids" nolabel="1"
-                                   readonly="state in ('submitted','approved')">
-                                <list editable="bottom" add-label="Add Expense">
+                            <field name="expense_line_ids" nolabel="1" add-label="Add Expense">
+                                <list>
                                     <field name="sequence" widget="handle"/>
+                                    <field name="date"/>
                                     <field name="category_id"/>
                                     <field name="description"/>
                                     <field name="amount" sum="Total Expense"/>
@@ -96,18 +109,6 @@
                         <field name="net_income" class="oe_subtotal_footer_separator"/>
                     </group>
                     <div class="oe_clear"/>
-                    <group string="Approval Details"
-                           invisible="state not in ('submitted','approved','returned')">
-                        <group>
-                            <field name="submitted_by" readonly="1"/>
-                            <field name="submitted_date" readonly="1"/>
-                        </group>
-                        <group>
-                            <field name="approved_by" readonly="1" invisible="state != 'approved'"/>
-                            <field name="approved_date" readonly="1" invisible="state != 'approved'"/>
-                            <field name="return_reason" readonly="1" invisible="state != 'returned'"/>
-                        </group>
-                    </group>
                 </sheet>
                 <chatter/>
             </form>
@@ -129,11 +130,6 @@
                 <field name="expense_line_ids" string="Expense Category"
                        filter_domain="[('expense_line_ids.category_id.name','ilike',self)]"/>
                 <separator/>
-                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
-                <filter string="Submitted" name="filter_submitted" domain="[('state','=','submitted')]"/>
-                <filter string="Approved" name="filter_approved" domain="[('state','=','approved')]"/>
-                <filter string="Returned" name="filter_returned" domain="[('state','=','returned')]"/>
-                <separator/>
                 <filter string="This Year" name="filter_this_year"
                         domain="[('year','=', context_today().year)]"/>
                 <separator string="Group By"/>
@@ -142,7 +138,6 @@
                     <filter string="City" name="groupby_city" context="{'group_by':'city_id'}"/>
                     <filter string="Year" name="groupby_year" context="{'group_by':'year'}"/>
                     <filter string="Month" name="groupby_month" context="{'group_by':'month'}"/>
-                    <filter string="Status" name="groupby_state" context="{'group_by':'state'}"/>
                 </group>
             </search>
         </field>
@@ -187,21 +182,8 @@
         <field name="context">{'search_default_filter_this_year': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Create the first monthly record</p>
-            <p>One record per City per Month. Fill in Income and Expense lines,
-               then Submit for your Manager's approval.</p>
-        </field>
-    </record>
-
-    <record id="action_expense_tracker_monthly_approvals" model="ir.actions.act_window">
-        <field name="name">Approvals</field>
-        <field name="res_model">expense.tracker.monthly</field>
-        <field name="view_mode">list,form,pivot,graph</field>
-        <field name="search_view_id" ref="view_expense_tracker_monthly_search"/>
-        <field name="domain">[('state','=','submitted')]</field>
-        <field name="context">{'search_default_filter_submitted': 1}</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Nothing waiting for approval</p>
-            <p>Records submitted by City Users for your cities will appear here for review.</p>
+            <p>One record per City per Month. Add Income and Expense entries any
+               time — nothing here is locked.</p>
         </field>
     </record>
 

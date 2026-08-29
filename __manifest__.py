@@ -2,7 +2,7 @@
     'name': 'Expense Tracker',
     'version': '19.0.1.0.0',
     'category': 'Accounting/Accounting',
-    'summary': 'Multi-city monthly income & expense tracking with City -> Manager -> Director approval workflow',
+    'summary': 'Multi-city monthly income & expense tracking with a City -> Manager -> Director hierarchy',
     'description': """
 Expense Tracker
 ================
@@ -15,7 +15,10 @@ Features
 * Predefined default Income / Expense lines, plus "+ Add Income" / "+ Add
   Expense" to add more, and line removal.
 * Automatic Total Income, Total Expense and Net Income calculation.
-* Draft -> Submitted -> Approved workflow, with Return-for-Correction.
+* Every Income / Expense entry is added through its own quick-entry form
+  (category, date, description, amount) - no inline grid editing.
+* Anyone with access to a city can create, edit, and delete that city's
+  records at any time - no approval workflow or locking.
 * City -> Manager -> Director security hierarchy enforced with Odoo
   security groups and record rules (server-side, not just UI-level).
 * City Statement report with drill-down: Manager -> City -> Month ->
@@ -36,7 +39,6 @@ Features
         'views/expense_tracker_category_views.xml',
         'views/expense_tracker_monthly_views.xml',
         'views/expense_tracker_line_report_views.xml',
-        'wizard/expense_tracker_return_wizard_views.xml',
         'report/expense_tracker_statement_report.xml',
         'report/expense_tracker_statement_templates.xml',
         'views/expense_tracker_res_users_views.xml',

@@ -22,13 +22,10 @@ class ExpenseTrackerLineReport(models.Model):
         ('9', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December'),
     ], readonly=True)
     year = fields.Integer(readonly=True)
-    state = fields.Selection([
-        ('draft', 'Draft'), ('submitted', 'Submitted'),
-        ('approved', 'Approved'), ('returned', 'Returned'),
-    ], string='Status', readonly=True)
     category_id = fields.Many2one('expense.tracker.category', string='Category', readonly=True)
     line_type = fields.Selection(
         [('income', 'Income'), ('expense', 'Expense')], string='Type', readonly=True)
+    date = fields.Date(readonly=True)
     description = fields.Char(readonly=True)
     amount = fields.Monetary(readonly=True)
     currency_id = fields.Many2one('res.currency', readonly=True)
@@ -45,9 +42,9 @@ class ExpenseTrackerLineReport(models.Model):
                     c.manager_id AS manager_id,
                     m.month AS month,
                     m.year AS year,
-                    m.state AS state,
                     l.category_id AS category_id,
                     'income' AS line_type,
+                    l.date AS date,
                     l.description AS description,
                     l.amount AS amount,
                     m.currency_id AS currency_id,
@@ -65,9 +62,9 @@ class ExpenseTrackerLineReport(models.Model):
                     c.manager_id AS manager_id,
                     m.month AS month,
                     m.year AS year,
-                    m.state AS state,
                     l.category_id AS category_id,
                     'expense' AS line_type,
+                    l.date AS date,
                     l.description AS description,
                     l.amount AS amount,
                     m.currency_id AS currency_id,

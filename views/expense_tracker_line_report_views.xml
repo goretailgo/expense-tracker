@@ -11,11 +11,11 @@
                 <field name="city_id"/>
                 <field name="month"/>
                 <field name="year"/>
+                <field name="date"/>
                 <field name="line_type"/>
                 <field name="category_id"/>
                 <field name="description"/>
                 <field name="amount" sum="Total"/>
-                <field name="state" widget="badge"/>
             </list>
         </field>
     </record>
@@ -32,11 +32,6 @@
                 <field name="year"/>
                 <filter string="Income" name="filter_income" domain="[('line_type','=','income')]"/>
                 <filter string="Expense" name="filter_expense" domain="[('line_type','=','expense')]"/>
-                <separator/>
-                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
-                <filter string="Submitted" name="filter_submitted" domain="[('state','=','submitted')]"/>
-                <filter string="Approved" name="filter_approved" domain="[('state','=','approved')]"/>
-                <filter string="Returned" name="filter_returned" domain="[('state','=','returned')]"/>
                 <separator/>
                 <filter string="This Year" name="filter_this_year"
                         domain="[('year','=', context_today().year)]"/>

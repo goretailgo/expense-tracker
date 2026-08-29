@@ -9,17 +9,13 @@
                             Income &amp; Expense Statement
                         </h2>
                         <div class="row mt32 mb32">
-                            <div class="col-4">
+                            <div class="col-6">
                                 <strong>City:</strong>
                                 <p t-field="o.city_id.name"/>
                             </div>
-                            <div class="col-4">
+                            <div class="col-6">
                                 <strong>Month:</strong>
                                 <p><span t-out="dict(o._fields['month'].selection).get(o.month)"/> <span t-field="o.year"/></p>
-                            </div>
-                            <div class="col-4">
-                                <strong>Status:</strong>
-                                <p t-field="o.state"/>
                             </div>
                         </div>
 
@@ -27,13 +23,15 @@
                         <table class="table table-sm o_main_table">
                             <thead>
                                 <tr>
+                                    <th>Date</th>
                                     <th>Category</th>
                                     <th>Description</th>
                                     <th class="text-end">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr t-foreach="o.income_line_ids" t-as="line">
+                                <tr t-foreach="o.income_line_ids.sorted('date')" t-as="line">
+                                    <td t-field="line.date"/>
                                     <td t-field="line.category_id.name"/>
                                     <td t-field="line.description"/>
                                     <td class="text-end" t-field="line.amount"/>
@@ -41,7 +39,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="2"><strong>Total Income</strong></td>
+                                    <td colspan="3"><strong>Total Income</strong></td>
                                     <td class="text-end"><strong t-field="o.total_income"/></td>
                                 </tr>
                             </tfoot>
@@ -51,13 +49,15 @@
                         <table class="table table-sm o_main_table">
                             <thead>
                                 <tr>
+                                    <th>Date</th>
                                     <th>Category</th>
                                     <th>Description</th>
                                     <th class="text-end">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr t-foreach="o.expense_line_ids" t-as="line">
+                                <tr t-foreach="o.expense_line_ids.sorted('date')" t-as="line">
+                                    <td t-field="line.date"/>
                                     <td t-field="line.category_id.name"/>
                                     <td t-field="line.description"/>
                                     <td class="text-end" t-field="line.amount"/>
@@ -65,7 +65,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="2"><strong>Total Expense</strong></td>
+                                    <td colspan="3"><strong>Total Expense</strong></td>
                                     <td class="text-end"><strong t-field="o.total_expense"/></td>
                                 </tr>
                             </tfoot>
