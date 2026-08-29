@@ -2,6 +2,7 @@
 import calendar
 
 from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 MONTH_SELECTION = [
     ('1', 'January'), ('2', 'February'), ('3', 'March'), ('4', 'April'),
@@ -48,6 +49,25 @@ class ExpenseTrackerMonthly(models.Model):
         'unique(city_id, month, year, company_id)',
         'A monthly record for this City and Month already exists!',
     )
+
+    @api.constrains('month', 'year')
+    def _check_lines_still_within_month(self):
+        # Mirror of expense.tracker.line's own date-boundary check, but
+        # from the other direction: don't let someone change a record's
+        # Month/Year out from under entries that were dated for the old one.
+        month_labels = dict(MONTH_SELECTION)
+        for rec in self:
+            mismatched = rec.line_ids.filtered(
+                lambda l: l.date and (l.date.year != rec.year or str(l.date.month) != rec.month))
+            if mismatched:
+                raise ValidationError(_(
+                    "Can't change this record to %(period)s: %(count)d entr%(plural)s "
+                    "still dated outside that month. Fix or remove those entries first."
+                ) % {
+                    'period': '%s %s' % (month_labels.get(rec.month), rec.year),
+                    'count': len(mismatched),
+                    'plural': 'y' if len(mismatched) == 1 else 'ies',
+                })
 
     def _default_city_id(self):
         cities = self.env['expense.tracker.city'].search([('user_ids', 'in', self.env.user.id)], limit=2)

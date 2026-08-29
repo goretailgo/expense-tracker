@@ -10,6 +10,9 @@
         <field name="model">expense.tracker.line</field>
         <field name="arch" type="xml">
             <form string="Income / Expense Entry">
+                <div class="alert alert-info" role="alert" invisible="not valid_period_label">
+                    This entry must be dated within <field name="valid_period_label" nolabel="1" readonly="1" class="oe_inline"/>.
+                </div>
                 <group>
                     <field name="line_type" widget="radio" options="{'horizontal': true}"/>
                     <field name="category_id" domain="[('type', '=', line_type)]" options="{'no_create': True}"/>

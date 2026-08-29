@@ -27,6 +27,18 @@ class ExpenseTrackerLine(models.Model):
     currency_id = fields.Many2one(related='monthly_id.currency_id', store=True, readonly=True)
     city_id = fields.Many2one(related='monthly_id.city_id', store=True, readonly=True, string='City')
 
+    valid_period_label = fields.Char(compute='_compute_valid_period_label')
+
+    @api.depends('monthly_id.month', 'monthly_id.year')
+    def _compute_valid_period_label(self):
+        month_labels = dict(self.env['expense.tracker.monthly']._fields['month'].selection)
+        for line in self:
+            if line.monthly_id.month and line.monthly_id.year:
+                line.valid_period_label = '%s %s' % (
+                    month_labels.get(line.monthly_id.month), line.monthly_id.year)
+            else:
+                line.valid_period_label = False
+
     @api.onchange('line_type')
     def _onchange_line_type(self):
         # Category belongs to a specific type, so clear it when the type
@@ -34,6 +46,21 @@ class ExpenseTrackerLine(models.Model):
         # (or vice versa).
         if self.category_id and self.category_id.type != self.line_type:
             self.category_id = False
+
+    @api.onchange('date', 'monthly_id')
+    def _onchange_date_boundary(self):
+        # Immediate feedback the moment the user picks a date, rather than
+        # only finding out after they hit Save (the hard constraint below
+        # still blocks the save regardless of whether this warning fires).
+        if self.date and self.monthly_id and self.monthly_id.month and self.monthly_id.year:
+            if self.date.year != self.monthly_id.year or str(self.date.month) != self.monthly_id.month:
+                return {'warning': {
+                    'title': _('Date outside this record\'s month'),
+                    'message': _(
+                        'This entry is for %(period)s, but the date you picked '
+                        'falls outside that month. It will be rejected on save.'
+                    ) % {'period': self.valid_period_label},
+                }}
 
     @api.constrains('date', 'monthly_id')
     def _check_date_within_month(self):
