@@ -44,3 +44,81 @@ class ExpenseTrackerLine(models.Model):
                         "Entry date %(date)s is outside %(record)s. "
                         "An entry's date must fall within its record's own Month and Year."
                     ) % {'date': line.date, 'record': line.monthly_id.name})
+
+    # ------------------------------------------------------------------
+    # Audit log: every add / edit / delete is posted to the parent Monthly
+    # record's chatter, so anyone opening that record can see who changed
+    # what and when (chatter shows the acting user and timestamp
+    # automatically). Logged for every user/role - nothing is skipped.
+    # ------------------------------------------------------------------
+    TRACKED_FIELDS = ('line_type', 'category_id', 'date', 'description', 'amount')
+
+    def _log_format_value(self, field_name, value):
+        if field_name == 'category_id':
+            return value.display_name if value else '—'
+        if field_name == 'line_type':
+            return dict(self._fields['line_type'].selection).get(value, value)
+        if field_name == 'amount':
+            symbol = self.currency_id.symbol or ''
+            return f"{symbol}{(value or 0.0):,.2f}"
+        if field_name == 'date':
+            return fields.Date.to_string(value) if value else '—'
+        return value or '—'
+
+    def _log_summary(self):
+        self.ensure_one()
+        type_label = dict(self._fields['line_type'].selection).get(self.line_type)
+        amount_label = self._log_format_value('amount', self.amount)
+        date_label = self._log_format_value('date', self.date)
+        desc = (' — %s' % self.description) if self.description else ''
+        return _("%(type)s entry: <b>%(category)s</b> — %(amount)s (%(date)s)%(desc)s") % {
+            'type': type_label,
+            'category': self.category_id.display_name if self.category_id else '—',
+            'amount': amount_label,
+            'date': date_label,
+            'desc': desc,
+        }
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        lines = super().create(vals_list)
+        for line in lines:
+            if line.monthly_id:
+                line.monthly_id.message_post(
+                    body=_("Entry added — %(summary)s") % {'summary': line._log_summary()})
+        return lines
+
+    def write(self, vals):
+        changed_fields = [f for f in self.TRACKED_FIELDS if f in vals]
+        old_data = {}
+        if changed_fields:
+            for line in self:
+                old_data[line.id] = {f: line[f] for f in changed_fields}
+
+        result = super().write(vals)
+
+        if changed_fields:
+            for line in self:
+                old = old_data.get(line.id)
+                if not old:
+                    continue
+                diffs = []
+                for f in changed_fields:
+                    old_label = self._log_format_value(f, old[f])
+                    new_label = self._log_format_value(f, line[f])
+                    if old_label != new_label:
+                        diffs.append('%s: %s → %s' % (line._fields[f].string, old_label, new_label))
+                if diffs and line.monthly_id:
+                    line.monthly_id.message_post(body=_(
+                        "Entry updated — %(summary)s<br/>%(diffs)s") % {
+                        'summary': line._log_summary(),
+                        'diffs': '<br/>'.join(diffs),
+                    })
+        return result
+
+    def unlink(self):
+        summaries = [(line.monthly_id, line._log_summary()) for line in self if line.monthly_id]
+        result = super().unlink()
+        for monthly, summary in summaries:
+            monthly.message_post(body=_("Entry removed — %(summary)s") % {'summary': summary})
+        return result
