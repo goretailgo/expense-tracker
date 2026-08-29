@@ -40,6 +40,16 @@ class ExpenseTrackerMonthly(models.Model):
     total_expense = fields.Monetary(compute='_compute_totals', store=True, string='Total Expense')
     net_income = fields.Monetary(compute='_compute_totals', store=True, string='Net Income')
 
+    # Named income-category columns for the Monthly Records list view.
+    # Matched by category name (not a fixed xmlid) since these were added
+    # as regular data by the user, not seeded by the module.
+    income_contribution = fields.Monetary(
+        compute='_compute_totals', store=True, string='Contribution')
+    income_zakat = fields.Monetary(
+        compute='_compute_totals', store=True, string='Zakat')
+    income_donation = fields.Monetary(
+        compute='_compute_totals', store=True, string='Donation')
+
     currency_id = fields.Many2one(
         'res.currency', string='Currency', default=lambda self: self.env.company.currency_id)
     company_id = fields.Many2one(
@@ -82,14 +92,24 @@ class ExpenseTrackerMonthly(models.Model):
             else:
                 rec.name = _('New')
 
-    @api.depends('line_ids.amount', 'line_ids.line_type')
+    @api.depends('line_ids.amount', 'line_ids.line_type', 'line_ids.category_id')
     def _compute_totals(self):
+        named_income_fields = {
+            'Contribution': 'income_contribution',
+            'Zakat': 'income_zakat',
+            'Donation': 'income_donation',
+        }
         for rec in self:
-            total_income = sum(rec.line_ids.filtered(lambda l: l.line_type == 'income').mapped('amount'))
-            total_expense = sum(rec.line_ids.filtered(lambda l: l.line_type == 'expense').mapped('amount'))
+            income_lines = rec.line_ids.filtered(lambda l: l.line_type == 'income')
+            expense_lines = rec.line_ids.filtered(lambda l: l.line_type == 'expense')
+            total_income = sum(income_lines.mapped('amount'))
+            total_expense = sum(expense_lines.mapped('amount'))
             rec.total_income = total_income
             rec.total_expense = total_expense
             rec.net_income = total_income - total_expense
+            for cat_name, field_name in named_income_fields.items():
+                rec[field_name] = sum(
+                    income_lines.filtered(lambda l: l.category_id.name == cat_name).mapped('amount'))
 
     @api.model_create_multi
     def create(self, vals_list):

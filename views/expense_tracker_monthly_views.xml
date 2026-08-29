@@ -36,6 +36,9 @@
                 <field name="manager_id"/>
                 <field name="month"/>
                 <field name="year" options="{'enable_formatting': false}"/>
+                <field name="income_contribution" sum="Total"/>
+                <field name="income_zakat" sum="Total"/>
+                <field name="income_donation" sum="Total"/>
                 <field name="total_income" sum="Total"/>
                 <field name="total_expense" sum="Total"/>
                 <field name="net_income" sum="Total"/>
