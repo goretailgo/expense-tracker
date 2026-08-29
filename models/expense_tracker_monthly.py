@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import calendar
+
 from odoo import api, fields, models, _
 
 MONTH_SELECTION = [
@@ -92,8 +94,17 @@ class ExpenseTrackerMonthly(models.Model):
     def action_add_line(self):
         """Open the entry popup (Type/Category/Date/Description/Amount) - the
         single 'Add Entry' button below Year replaces the default 'Add a
-        line' link on the Entries list."""
+        line' link on the Entries list. Defaults the Date to a day inside
+        THIS record's own Month/Year (not today's real-world date), so
+        entries can't accidentally end up dated outside the sheet they're
+        being added to."""
         self.ensure_one()
+        today = fields.Date.context_today(self)
+        year = self.year
+        month = int(self.month)
+        last_day = calendar.monthrange(year, month)[1]
+        day = min(today.day, last_day) if today.year == year and today.month == month else last_day
+        default_date = fields.Date.to_string(today.replace(year=year, month=month, day=day))
         return {
             'type': 'ir.actions.act_window',
             'name': _('Add Entry'),
@@ -101,5 +112,5 @@ class ExpenseTrackerMonthly(models.Model):
             'view_mode': 'form',
             'views': [(self.env.ref('expense_tracker.view_expense_tracker_line_form').id, 'form')],
             'target': 'new',
-            'context': {'default_monthly_id': self.id},
+            'context': {'default_monthly_id': self.id, 'default_date': default_date},
         }

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models
+from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 
 class ExpenseTrackerLine(models.Model):
@@ -33,3 +34,13 @@ class ExpenseTrackerLine(models.Model):
         # (or vice versa).
         if self.category_id and self.category_id.type != self.line_type:
             self.category_id = False
+
+    @api.constrains('date', 'monthly_id')
+    def _check_date_within_month(self):
+        for line in self:
+            if line.monthly_id and line.date:
+                if line.date.year != line.monthly_id.year or str(line.date.month) != line.monthly_id.month:
+                    raise ValidationError(_(
+                        "Entry date %(date)s is outside %(record)s. "
+                        "An entry's date must fall within its record's own Month and Year."
+                    ) % {'date': line.date, 'record': line.monthly_id.name})
