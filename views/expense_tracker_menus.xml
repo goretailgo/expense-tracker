@@ -6,6 +6,12 @@
               groups="expense_tracker.group_expense_city_user"
               sequence="60"/>
 
+    <menuitem id="menu_expense_tracker_director_overview" name="Director Overview"
+              parent="menu_expense_tracker_root"
+              action="action_expense_tracker_director_overview"
+              groups="expense_tracker.group_expense_director"
+              sequence="5"/>
+
     <menuitem id="menu_expense_tracker_monthly" name="Monthly Records"
               parent="menu_expense_tracker_root"
               action="action_expense_tracker_monthly"
