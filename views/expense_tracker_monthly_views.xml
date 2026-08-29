@@ -39,7 +39,7 @@
                 <field name="income_contribution" sum="Total"/>
                 <field name="income_zakat" sum="Total"/>
                 <field name="income_donation" sum="Total"/>
-                <field name="total_income" sum="Total"/>
+                <field name="total_income" sum="Total" widget="income_dollar_toggle"/>
                 <field name="total_expense" sum="Total"/>
                 <field name="net_income" sum="Total"/>
             </list>

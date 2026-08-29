@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+  <t t-name="expense_tracker.IncomeDollarToggleField" owl="1">
+    <span class="o_expense_dollar_toggle d-inline-flex align-items-center justify-content-end w-100">
+      <span t-esc="displayValue"/>
+      <button type="button"
+              class="btn btn-sm btn-link p-0 ms-1 o_expense_dollar_toggle_btn"
+              t-on-click="onToggleClick"
+              t-att-title="curr.showDollar ? 'Show in ₹ (original)' : 'Convert to $ (display only)'">
+        <i t-att-class="curr.showDollar ? 'fa fa-inr' : 'fa fa-usd'"/>
+      </button>
+    </span>
+  </t>
+</templates>

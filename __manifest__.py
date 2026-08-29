@@ -44,6 +44,13 @@ Features
         'views/expense_tracker_res_users_views.xml',
         'views/expense_tracker_menus.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'expense_tracker/static/src/js/income_dollar_toggle_field.js',
+            'expense_tracker/static/src/xml/income_dollar_toggle_templates.xml',
+            'expense_tracker/static/src/css/income_dollar_toggle.css',
+        ],
+    },
     'images': ['static/description/icon.png'],
     'application': True,
     'installable': True,
