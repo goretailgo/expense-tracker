@@ -88,3 +88,18 @@ class ExpenseTrackerMonthly(models.Model):
                 'line_type': cat.type,
                 'amount': 0.0,
             })
+
+    def action_add_line(self):
+        """Open the entry popup (Type/Category/Date/Description/Amount) - the
+        single 'Add Entry' button below Year replaces the default 'Add a
+        line' link on the Entries list."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Add Entry'),
+            'res_model': 'expense.tracker.line',
+            'view_mode': 'form',
+            'views': [(self.env.ref('expense_tracker.view_expense_tracker_line_form').id, 'form')],
+            'target': 'new',
+            'context': {'default_monthly_id': self.id},
+        }
