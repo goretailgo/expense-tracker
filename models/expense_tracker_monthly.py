@@ -99,16 +99,32 @@ class ExpenseTrackerMonthly(models.Model):
                 rec._add_default_lines()
         return records
 
+    def _default_date_in_period(self):
+        """A date guaranteed to fall inside THIS record's own Month/Year -
+        today's real date if it happens to match, otherwise the last day of
+        that month. Used both for the auto-created starter lines and for
+        the 'Add Entry' popup, so neither ever produces a date that trips
+        the boundary validation on expense.tracker.line."""
+        self.ensure_one()
+        today = fields.Date.context_today(self)
+        year = self.year
+        month = int(self.month)
+        last_day = calendar.monthrange(year, month)[1]
+        day = min(today.day, last_day) if today.year == year and today.month == month else last_day
+        return today.replace(year=year, month=month, day=day)
+
     def _add_default_lines(self):
         self.ensure_one()
         Category = self.env['expense.tracker.category']
         default_categories = Category.search([('is_default', '=', True)])
+        default_date = self._default_date_in_period()
         for cat in default_categories:
             self.env['expense.tracker.line'].create({
                 'monthly_id': self.id,
                 'category_id': cat.id,
                 'line_type': cat.type,
                 'amount': 0.0,
+                'date': default_date,
             })
 
     def action_add_line(self):
@@ -119,12 +135,7 @@ class ExpenseTrackerMonthly(models.Model):
         entries can't accidentally end up dated outside the sheet they're
         being added to."""
         self.ensure_one()
-        today = fields.Date.context_today(self)
-        year = self.year
-        month = int(self.month)
-        last_day = calendar.monthrange(year, month)[1]
-        day = min(today.day, last_day) if today.year == year and today.month == month else last_day
-        default_date = fields.Date.to_string(today.replace(year=year, month=month, day=day))
+        default_date = fields.Date.to_string(self._default_date_in_period())
         return {
             'type': 'ir.actions.act_window',
             'name': _('Add Entry'),
