@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
+from markupsafe import Markup
 
 
 class ExpenseTrackerLine(models.Model):
@@ -95,16 +96,21 @@ class ExpenseTrackerLine(models.Model):
     def _log_summary(self):
         self.ensure_one()
         type_label = dict(self._fields['line_type'].selection).get(self.line_type)
+        category_label = self.category_id.display_name if self.category_id else '—'
         amount_label = self._log_format_value('amount', self.amount)
         date_label = self._log_format_value('date', self.date)
-        desc = (' — %s' % self.description) if self.description else ''
-        return _("%(type)s entry: <b>%(category)s</b> — %(amount)s (%(date)s)%(desc)s") % {
+        summary = Markup(
+            '<b>%(category)s</b> <span class="text-muted">(%(type)s)</span> '
+            '— %(amount)s on %(date)s'
+        ) % {
+            'category': category_label,
             'type': type_label,
-            'category': self.category_id.display_name if self.category_id else '—',
             'amount': amount_label,
             'date': date_label,
-            'desc': desc,
         }
+        if self.description:
+            summary += Markup(' — <i>%s</i>') % self.description
+        return summary
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -112,7 +118,7 @@ class ExpenseTrackerLine(models.Model):
         for line in lines:
             if line.monthly_id:
                 line.monthly_id.message_post(
-                    body=_("Entry added — %(summary)s") % {'summary': line._log_summary()})
+                    body=Markup('<b>Entry added:</b> %s') % line._log_summary())
         return lines
 
     def write(self, vals):
@@ -129,23 +135,22 @@ class ExpenseTrackerLine(models.Model):
                 old = old_data.get(line.id)
                 if not old:
                     continue
-                diffs = []
+                diff_items = []
                 for f in changed_fields:
                     old_label = self._log_format_value(f, old[f])
                     new_label = self._log_format_value(f, line[f])
                     if old_label != new_label:
-                        diffs.append('%s: %s → %s' % (line._fields[f].string, old_label, new_label))
-                if diffs and line.monthly_id:
-                    line.monthly_id.message_post(body=_(
-                        "Entry updated — %(summary)s<br/>%(diffs)s") % {
-                        'summary': line._log_summary(),
-                        'diffs': '<br/>'.join(diffs),
-                    })
+                        diff_items.append(Markup('<li>%s: %s → <b>%s</b></li>') % (
+                            line._fields[f].string, old_label, new_label))
+                if diff_items and line.monthly_id:
+                    body = Markup('<b>Entry updated:</b> %s<ul class="mb-0 ps-3">%s</ul>') % (
+                        line._log_summary(), Markup('').join(diff_items))
+                    line.monthly_id.message_post(body=body)
         return result
 
     def unlink(self):
         summaries = [(line.monthly_id, line._log_summary()) for line in self if line.monthly_id]
         result = super().unlink()
         for monthly, summary in summaries:
-            monthly.message_post(body=_("Entry removed — %(summary)s") % {'summary': summary})
+            monthly.message_post(body=Markup('<b>Entry removed:</b> %s') % summary)
         return result
