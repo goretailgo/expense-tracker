@@ -33,12 +33,6 @@ class ExpenseTrackerMonthly(models.Model):
 
     line_ids = fields.One2many('expense.tracker.line', 'monthly_id', string='Entries', copy=True)
 
-    # UI-only toggle (never stored) so the entries list can be filtered to
-    # show All / Income only / Expense only without leaving the form.
-    line_filter = fields.Selection(
-        [('all', 'All'), ('income', 'Income'), ('expense', 'Expense')],
-        string='Show', compute='_compute_line_filter', readonly=False, store=False)
-
     total_income = fields.Monetary(compute='_compute_totals', store=True, string='Total Income')
     total_expense = fields.Monetary(compute='_compute_totals', store=True, string='Total Expense')
     net_income = fields.Monetary(compute='_compute_totals', store=True, string='Net Income')
@@ -52,11 +46,6 @@ class ExpenseTrackerMonthly(models.Model):
         'unique(city_id, month, year, company_id)',
         'A monthly record for this City and Month already exists!',
     )
-
-    def _compute_line_filter(self):
-        for rec in self:
-            if not rec.line_filter:
-                rec.line_filter = 'all'
 
     def _default_city_id(self):
         cities = self.env['expense.tracker.city'].search([('user_ids', 'in', self.env.user.id)], limit=2)

@@ -62,11 +62,7 @@
                             <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
-                    <group>
-                        <field name="line_filter" widget="radio" options="{'horizontal': true}"/>
-                    </group>
-                    <field name="line_ids" nolabel="1" add-label="Add Entry"
-                           domain="[('line_type', 'in', ['income', 'expense'] if line_filter == 'all' else [line_filter])]">
+                    <field name="line_ids" nolabel="1" add-label="Add Entry" default_group_by="line_type">
                         <list>
                             <field name="sequence" widget="handle"/>
                             <field name="date"/>
