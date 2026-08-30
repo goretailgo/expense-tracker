@@ -55,6 +55,17 @@ class ExpenseTrackerMonthly(models.Model):
     income_donation = fields.Monetary(
         compute='_compute_totals', store=True, string='Donation')
 
+    # Matching expense-side columns: this month's expenses charged against
+    # each income account (via expense.tracker.line.income_account_id).
+    # Same aggregation style as the income columns above - no running
+    # opening/closing balance, just this month's figure per account.
+    expense_contribution = fields.Monetary(
+        compute='_compute_totals', store=True, string='Exp. Contribution')
+    expense_zakat = fields.Monetary(
+        compute='_compute_totals', store=True, string='Exp. Zakat')
+    expense_donation = fields.Monetary(
+        compute='_compute_totals', store=True, string='Exp. Donation')
+
     currency_id = fields.Many2one(
         'res.currency', string='Currency', default=lambda self: self.env.company.currency_id)
     company_id = fields.Many2one(
@@ -97,12 +108,17 @@ class ExpenseTrackerMonthly(models.Model):
             else:
                 rec.name = _('New')
 
-    @api.depends('line_ids.amount', 'line_ids.line_type', 'line_ids.category_id')
+    @api.depends('line_ids.amount', 'line_ids.line_type', 'line_ids.category_id', 'line_ids.income_account_id')
     def _compute_totals(self):
         named_income_fields = {
             'Contribution': 'income_contribution',
             'Zakat': 'income_zakat',
             'Donation': 'income_donation',
+        }
+        named_expense_fields = {
+            'Contribution': 'expense_contribution',
+            'Zakat': 'expense_zakat',
+            'Donation': 'expense_donation',
         }
         for rec in self:
             income_lines = rec.line_ids.filtered(lambda l: l.line_type == 'income')
@@ -115,6 +131,9 @@ class ExpenseTrackerMonthly(models.Model):
             for cat_name, field_name in named_income_fields.items():
                 rec[field_name] = sum(
                     income_lines.filtered(lambda l: l.category_id.name == cat_name).mapped('amount'))
+            for cat_name, field_name in named_expense_fields.items():
+                rec[field_name] = sum(
+                    expense_lines.filtered(lambda l: l.income_account_id.name == cat_name).mapped('amount'))
 
     @api.model_create_multi
     def create(self, vals_list):
