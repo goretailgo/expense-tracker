@@ -58,6 +58,10 @@
                 <header>
                     <button name="action_submit" type="object" string="Submit"
                             class="btn-primary" invisible="state == 'submitted'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"
+                            groups="expense_tracker.group_expense_director"
+                            confirm="Reset this submitted record back to Draft for correction?"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted"/>
                 </header>
                 <sheet>

@@ -2,7 +2,7 @@
 import calendar
 
 from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import AccessError, ValidationError
 
 MONTH_SELECTION = [
     ('1', 'January'), ('2', 'February'), ('3', 'March'), ('4', 'April'),
@@ -152,9 +152,18 @@ class ExpenseTrackerMonthly(models.Model):
         """City User submits the sheet once it's ready - only then does it
         become visible to Manager/Director (see the record rules in
         expense_tracker_security.xml, which filter their access to
-        state='submitted'). Submission is final for now - there is no
-        reset-to-draft path for anyone, including Director."""
+        state='submitted'). Submission is final for City User/Manager -
+        only Director can reopen it (action_reset_to_draft, group-gated
+        on the button in the form view)."""
         self.write({'state': 'submitted'})
+
+    def action_reset_to_draft(self):
+        """Director-only: pull a submitted sheet back to Draft for a
+        correction. Enforced here (not just by hiding the button), so it
+        can't be triggered by a non-Director via dev tools/API either."""
+        if not self.env.user.has_group('expense_tracker.group_expense_director'):
+            raise AccessError(_("Only a Director can reset a submitted record back to Draft."))
+        self.write({'state': 'draft'})
 
     def action_add_line(self):
         """Open the entry popup (Type/Category/Date/Description/Amount) - the
