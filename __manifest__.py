@@ -39,6 +39,7 @@ Features
         'views/expense_tracker_category_views.xml',
         'views/expense_tracker_monthly_views.xml',
         'views/expense_tracker_line_report_views.xml',
+        'views/expense_tracker_balance_report_views.xml',
         'report/expense_tracker_statement_report.xml',
         'report/expense_tracker_statement_templates.xml',
         'views/expense_tracker_res_users_views.xml',

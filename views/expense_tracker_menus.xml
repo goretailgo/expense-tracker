@@ -14,7 +14,7 @@
 
     <menuitem id="menu_expense_tracker_report" name="Report"
               parent="menu_expense_tracker_root"
-              action="action_expense_tracker_director_overview"
+              action="action_expense_tracker_balance_report"
               groups="expense_tracker.group_expense_director"
               sequence="15"/>
 
