@@ -20,6 +20,11 @@ class ExpenseTrackerMonthly(models.Model):
 
     name = fields.Char(compute='_compute_name', store=True)
 
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+    ], string='Status', default='draft', tracking=True, copy=False, index=True)
+
     city_id = fields.Many2one(
         'expense.tracker.city', string='City', required=True, tracking=True,
         ondelete='restrict', index=True,
@@ -142,6 +147,18 @@ class ExpenseTrackerMonthly(models.Model):
         action['view_mode'] = 'list,form'
         action.pop('res_id', None)
         return action
+
+    def action_submit(self):
+        """City User submits the sheet once it's ready - only then does it
+        become visible to Manager/Director (see the record rules in
+        expense_tracker_security.xml, which filter their access to
+        state='submitted')."""
+        self.write({'state': 'submitted'})
+
+    def action_reset_to_draft(self):
+        """Pull a submitted sheet back to Draft, e.g. to fix an entry -
+        it drops out of Manager/Director's view again until re-submitted."""
+        self.write({'state': 'draft'})
 
     def action_add_line(self):
         """Open the entry popup (Type/Category/Date/Description/Amount) - the

@@ -67,16 +67,16 @@
     </record>
 
     <record id="rule_monthly_manager" model="ir.rule">
-        <field name="name">Expense Tracker Monthly: Manager sees assigned cities' records</field>
+        <field name="name">Expense Tracker Monthly: Manager sees assigned cities' submitted records</field>
         <field name="model_id" ref="model_expense_tracker_monthly"/>
-        <field name="domain_force">[('city_id.manager_id', '=', user.id)]</field>
+        <field name="domain_force">[('city_id.manager_id', '=', user.id), ('state', '=', 'submitted')]</field>
         <field name="groups" eval="[(4, ref('group_expense_manager'))]"/>
     </record>
 
     <record id="rule_monthly_director" model="ir.rule">
-        <field name="name">Expense Tracker Monthly: Director sees all records</field>
+        <field name="name">Expense Tracker Monthly: Director sees all submitted records</field>
         <field name="model_id" ref="model_expense_tracker_monthly"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[('state', '=', 'submitted')]</field>
         <field name="groups" eval="[(4, ref('group_expense_director'))]"/>
     </record>
 
@@ -89,16 +89,16 @@
     </record>
 
     <record id="rule_line_manager" model="ir.rule">
-        <field name="name">Expense Tracker Line: Manager</field>
+        <field name="name">Expense Tracker Line: Manager (submitted only)</field>
         <field name="model_id" ref="model_expense_tracker_line"/>
-        <field name="domain_force">[('monthly_id.city_id.manager_id', '=', user.id)]</field>
+        <field name="domain_force">[('monthly_id.city_id.manager_id', '=', user.id), ('monthly_id.state', '=', 'submitted')]</field>
         <field name="groups" eval="[(4, ref('group_expense_manager'))]"/>
     </record>
 
     <record id="rule_line_director" model="ir.rule">
-        <field name="name">Expense Tracker Line: Director</field>
+        <field name="name">Expense Tracker Line: Director (submitted only)</field>
         <field name="model_id" ref="model_expense_tracker_line"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[('monthly_id.state', '=', 'submitted')]</field>
         <field name="groups" eval="[(4, ref('group_expense_director'))]"/>
     </record>
 
@@ -111,16 +111,16 @@
     </record>
 
     <record id="rule_line_report_manager" model="ir.rule">
-        <field name="name">Expense Tracker Statement: Manager</field>
+        <field name="name">Expense Tracker Statement: Manager (submitted only)</field>
         <field name="model_id" ref="model_expense_tracker_line_report"/>
-        <field name="domain_force">[('manager_id', '=', user.id)]</field>
+        <field name="domain_force">[('manager_id', '=', user.id), ('monthly_id.state', '=', 'submitted')]</field>
         <field name="groups" eval="[(4, ref('group_expense_manager'))]"/>
     </record>
 
     <record id="rule_line_report_director" model="ir.rule">
-        <field name="name">Expense Tracker Statement: Director</field>
+        <field name="name">Expense Tracker Statement: Director (submitted only)</field>
         <field name="model_id" ref="model_expense_tracker_line_report"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[('monthly_id.state', '=', 'submitted')]</field>
         <field name="groups" eval="[(4, ref('group_expense_director'))]"/>
     </record>
 

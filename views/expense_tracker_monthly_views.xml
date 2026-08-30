@@ -36,6 +36,9 @@
                 <field name="manager_id"/>
                 <field name="month"/>
                 <field name="year" options="{'enable_formatting': false}"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'submitted'"
+                       decoration-muted="state == 'draft'"/>
                 <field name="income_contribution" sum="Total"/>
                 <field name="income_zakat" sum="Total"/>
                 <field name="income_donation" sum="Total"/>
@@ -52,6 +55,13 @@
         <field name="model">expense.tracker.monthly</field>
         <field name="arch" type="xml">
             <form string="Monthly Income &amp; Expense" create="false" delete="false">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="btn-primary" invisible="state == 'submitted'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted"/>
+                </header>
                 <sheet>
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
@@ -115,6 +125,8 @@
                 <separator/>
                 <filter string="This Year" name="filter_this_year"
                         domain="[('year','=', context_today().year)]"/>
+                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Submitted" name="filter_submitted" domain="[('state','=','submitted')]"/>
                 <separator string="Group By"/>
                 <group>
                     <filter string="Manager" name="groupby_manager" context="{'group_by':'manager_id'}"/>
