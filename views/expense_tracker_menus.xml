@@ -12,17 +12,11 @@
               groups="expense_tracker.group_expense_city_user"
               sequence="5"/>
 
-    <menuitem id="menu_expense_tracker_director_overview" name="Director Overview"
+    <menuitem id="menu_expense_tracker_report" name="Report"
               parent="menu_expense_tracker_root"
               action="action_expense_tracker_director_overview"
               groups="expense_tracker.group_expense_director"
               sequence="15"/>
-
-    <menuitem id="menu_expense_tracker_statement" name="Statement"
-              parent="menu_expense_tracker_root"
-              action="action_expense_tracker_line_report"
-              groups="expense_tracker.group_expense_city_user"
-              sequence="20"/>
 
     <menuitem id="menu_expense_tracker_configuration" name="Configuration"
               parent="menu_expense_tracker_root"
