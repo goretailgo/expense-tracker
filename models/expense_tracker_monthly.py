@@ -152,13 +152,9 @@ class ExpenseTrackerMonthly(models.Model):
         """City User submits the sheet once it's ready - only then does it
         become visible to Manager/Director (see the record rules in
         expense_tracker_security.xml, which filter their access to
-        state='submitted')."""
+        state='submitted'). Submission is final for now - there is no
+        reset-to-draft path for anyone, including Director."""
         self.write({'state': 'submitted'})
-
-    def action_reset_to_draft(self):
-        """Pull a submitted sheet back to Draft, e.g. to fix an entry -
-        it drops out of Manager/Director's view again until re-submitted."""
-        self.write({'state': 'draft'})
 
     def action_add_line(self):
         """Open the entry popup (Type/Category/Date/Description/Amount) - the
