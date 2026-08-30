@@ -57,7 +57,8 @@
             <form string="Monthly Income &amp; Expense" create="false" delete="false">
                 <header>
                     <button name="action_submit" type="object" string="Submit"
-                            class="btn-primary" invisible="state == 'submitted'"/>
+                            class="btn-primary" invisible="state == 'submitted'"
+                            confirm="This is the final step - once submitted, it becomes visible to your Manager and Director, and only a Director can send it back to Draft. If you still need to add more entries, click Cancel and add them first. Click OK to confirm submission."/>
                     <button name="action_reset_to_draft" type="object" string="Reset to Draft"
                             invisible="state == 'draft'"
                             groups="expense_tracker.group_expense_director"
