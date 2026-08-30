@@ -86,6 +86,7 @@
                                 class="btn btn-success" icon="fa-plus"/>
                         <button name="action_delete_and_redirect" type="object" string="Delete"
                                 class="btn btn-outline-danger ms-2" icon="fa-trash"
+                                invisible="state == 'submitted'"
                                 confirm="Delete this monthly record and all its entries? This cannot be undone."/>
                     </div>
                     <field name="line_ids" nolabel="1" default_group_by="line_type">

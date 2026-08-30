@@ -122,6 +122,17 @@ class ExpenseTrackerMonthly(models.Model):
         # 'Add Entry' button, not auto-seeded from default categories.
         return super().create(vals_list)
 
+    def unlink(self):
+        # Draft only - once a sheet is Submitted, deleting it is blocked
+        # for everyone (City User, Manager, Director alike), not just via
+        # the form's Delete button but also list-view bulk delete/API.
+        if any(rec.state == 'submitted' for rec in self):
+            raise ValidationError(_(
+                "Submitted records can't be deleted. Reset to Draft first "
+                "(Director only) if this record needs to be removed."
+            ))
+        return super().unlink()
+
     def _default_date_in_period(self):
         """A date guaranteed to fall inside THIS record's own Month/Year -
         today's real date if it happens to match, otherwise the last day of
