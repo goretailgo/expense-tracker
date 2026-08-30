@@ -141,6 +141,21 @@ class ExpenseTrackerMonthly(models.Model):
         # 'Add Entry' button, not auto-seeded from default categories.
         return super().create(vals_list)
 
+    def write(self, vals):
+        # City/Month/Year identify the sheet - once Submitted, they're
+        # locked for everyone (not just entries, which were already locked
+        # separately on expense.tracker.line). Guarded here so it can't be
+        # bypassed via API/dev tools, in addition to readonly on the form.
+        protected_fields = {'city_id', 'month', 'year'}
+        if protected_fields & vals.keys():
+            submitted = self.filtered(lambda r: r.state == 'submitted')
+            if submitted:
+                raise ValidationError(_(
+                    "City/Month/Year can't be changed on a Submitted record (%s). "
+                    "A Director needs to reset it to Draft first."
+                ) % ', '.join(submitted.mapped('name')))
+        return super().write(vals)
+
     def unlink(self):
         # Draft only - once a sheet is Submitted, deleting it is blocked
         # for everyone (City User, Manager, Director alike), not just via

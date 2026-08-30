@@ -79,9 +79,9 @@
                     </div>
                     <group>
                         <group>
-                            <field name="city_id" options="{'no_create': True}"/>
-                            <field name="month"/>
-                            <field name="year" options="{'enable_formatting': false}"/>
+                            <field name="city_id" options="{'no_create': True}" readonly="state == 'submitted'"/>
+                            <field name="month" readonly="state == 'submitted'"/>
+                            <field name="year" options="{'enable_formatting': false}" readonly="state == 'submitted'"/>
                         </group>
                         <group>
                             <field name="manager_id" readonly="1"/>
