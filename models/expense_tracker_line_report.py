@@ -21,7 +21,7 @@ class ExpenseTrackerLineReport(models.Model):
         ('5', 'May'), ('6', 'June'), ('7', 'July'), ('8', 'August'),
         ('9', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December'),
     ], readonly=True)
-    year = fields.Integer(readonly=True)
+    year = fields.Integer(readonly=True, aggregator=None)
     category_id = fields.Many2one('expense.tracker.category', string='Category', readonly=True)
     income_account_id = fields.Many2one(
         'expense.tracker.category', string='Income Account', readonly=True,

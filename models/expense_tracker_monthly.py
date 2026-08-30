@@ -36,7 +36,7 @@ class ExpenseTrackerMonthly(models.Model):
         MONTH_SELECTION, required=True, tracking=True,
         default=lambda self: str(fields.Date.context_today(self).month))
     year = fields.Integer(
-        required=True, tracking=True,
+        required=True, tracking=True, aggregator=None,
         default=lambda self: fields.Date.context_today(self).year)
 
     line_ids = fields.One2many('expense.tracker.line', 'monthly_id', string='Entries', copy=True)
