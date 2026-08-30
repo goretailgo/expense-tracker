@@ -15,6 +15,11 @@
                 </div>
                 <group>
                     <field name="line_type" widget="radio" options="{'horizontal': true}"/>
+                    <field name="income_account_id" string="Income Account"
+                           domain="[('type', '=', 'income')]" options="{'no_create': True}"
+                           invisible="line_type == 'income'"
+                           required="line_type == 'expense'"
+                           placeholder="e.g. Contribution, Donation, Zakat..."/>
                     <field name="category_id" domain="[('type', '=', line_type)]" options="{'no_create': True}"/>
                     <field name="date"/>
                     <field name="description"/>
@@ -98,6 +103,7 @@
                             <field name="line_type" widget="badge"
                                    decoration-success="line_type == 'income'"
                                    decoration-danger="line_type == 'expense'"/>
+                            <field name="income_account_id" string="Income Account" optional="show"/>
                             <field name="category_id"/>
                             <field name="description"/>
                             <field name="amount" sum="Total"/>

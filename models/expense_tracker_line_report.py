@@ -23,6 +23,10 @@ class ExpenseTrackerLineReport(models.Model):
     ], readonly=True)
     year = fields.Integer(readonly=True)
     category_id = fields.Many2one('expense.tracker.category', string='Category', readonly=True)
+    income_account_id = fields.Many2one(
+        'expense.tracker.category', string='Income Account', readonly=True,
+        help="For Expense lines: the income category this expense was charged "
+             "against. Empty for Income lines.")
     line_type = fields.Selection(
         [('income', 'Income'), ('expense', 'Expense')], string='Type', readonly=True)
     date = fields.Date(readonly=True)
@@ -43,6 +47,7 @@ class ExpenseTrackerLineReport(models.Model):
                     m.month AS month,
                     m.year AS year,
                     l.category_id AS category_id,
+                    l.income_account_id AS income_account_id,
                     l.line_type AS line_type,
                     l.date AS date,
                     l.description AS description,

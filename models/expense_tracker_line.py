@@ -21,6 +21,14 @@ class ExpenseTrackerLine(models.Model):
         string='Type', required=True, default='income', tracking=True)
     category_id = fields.Many2one(
         'expense.tracker.category', string='Category', required=True)
+    income_account_id = fields.Many2one(
+        'expense.tracker.category', string='Income Account',
+        domain=[('type', '=', 'income')],
+        help="Which income category (Contribution, Donation, Zakat, etc.) this "
+             "expense is being paid out of. Only set on Expense entries - each "
+             "income category acts as its own account/budget, and every expense "
+             "must be charged against one of them so income vs. expense can be "
+             "tracked per category, not just in aggregate.")
     date = fields.Date(string='Date', required=True, default=fields.Date.context_today)
     description = fields.Char(string='Description')
     amount = fields.Monetary(string='Amount', required=True, default=0.0)
@@ -47,6 +55,24 @@ class ExpenseTrackerLine(models.Model):
         # (or vice versa).
         if self.category_id and self.category_id.type != self.line_type:
             self.category_id = False
+        # Income Account only applies to Expense entries - an Income entry
+        # IS an account (its own category), it doesn't draw from one.
+        if self.line_type == 'income' and self.income_account_id:
+            self.income_account_id = False
+
+    @api.constrains('line_type', 'income_account_id')
+    def _check_income_account_required(self):
+        for line in self:
+            if line.line_type == 'expense' and not line.income_account_id:
+                raise ValidationError(_(
+                    "Please select which Income Account (Contribution, Donation, "
+                    "Zakat, etc.) this expense is being paid out of."
+                ))
+            if line.line_type == 'income' and line.income_account_id:
+                raise ValidationError(_(
+                    "Income Account only applies to Expense entries - an Income "
+                    "entry is itself an account, so it can't also draw from one."
+                ))
 
     @api.onchange('date', 'monthly_id')
     def _onchange_date_boundary(self):
@@ -79,10 +105,10 @@ class ExpenseTrackerLine(models.Model):
     # what and when (chatter shows the acting user and timestamp
     # automatically). Logged for every user/role - nothing is skipped.
     # ------------------------------------------------------------------
-    TRACKED_FIELDS = ('line_type', 'category_id', 'date', 'description', 'amount')
+    TRACKED_FIELDS = ('line_type', 'category_id', 'income_account_id', 'date', 'description', 'amount')
 
     def _log_format_value(self, field_name, value):
-        if field_name == 'category_id':
+        if field_name in ('category_id', 'income_account_id'):
             return value.display_name if value else '—'
         if field_name == 'line_type':
             return dict(self._fields['line_type'].selection).get(value, value)
@@ -108,6 +134,8 @@ class ExpenseTrackerLine(models.Model):
             'amount': amount_label,
             'date': date_label,
         }
+        if self.line_type == 'expense' and self.income_account_id:
+            summary += Markup(' <span class="text-muted">from %s</span>') % self.income_account_id.display_name
         if self.description:
             summary += Markup(' — <i>%s</i>') % self.description
         return summary

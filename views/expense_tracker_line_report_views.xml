@@ -13,6 +13,7 @@
                 <field name="year" options="{'enable_formatting': false}"/>
                 <field name="date"/>
                 <field name="line_type"/>
+                <field name="income_account_id" string="Income Account"/>
                 <field name="category_id"/>
                 <field name="description"/>
                 <field name="amount" sum="Total"/>
@@ -28,6 +29,7 @@
                 <field name="city_id"/>
                 <field name="manager_id"/>
                 <field name="category_id"/>
+                <field name="income_account_id" string="Income Account"/>
                 <field name="month"/>
                 <field name="year"/>
                 <filter string="Income" name="filter_income" domain="[('line_type','=','income')]"/>
@@ -41,6 +43,7 @@
                     <filter string="City" name="groupby_city" context="{'group_by':'city_id'}"/>
                     <filter string="Month" name="groupby_month" context="{'group_by':'month'}"/>
                     <filter string="Category" name="groupby_category" context="{'group_by':'category_id'}"/>
+                    <filter string="Income Account" name="groupby_income_account" context="{'group_by':'income_account_id'}"/>
                     <filter string="Type" name="groupby_type" context="{'group_by':'line_type'}"/>
                 </group>
             </search>
@@ -55,6 +58,7 @@
                 <field name="manager_id" type="row"/>
                 <field name="city_id" type="row"/>
                 <field name="month" type="row"/>
+                <field name="income_account_id" type="row"/>
                 <field name="category_id" type="row"/>
                 <field name="line_type" type="col"/>
                 <field name="amount" type="measure"/>
@@ -105,6 +109,7 @@
                 <field name="month"/>
                 <field name="date"/>
                 <field name="line_type"/>
+                <field name="income_account_id" string="Income Account"/>
                 <field name="category_id"/>
                 <field name="description"/>
                 <field name="amount" sum="Total"/>
