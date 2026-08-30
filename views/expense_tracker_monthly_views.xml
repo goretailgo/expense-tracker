@@ -31,7 +31,7 @@
         <field name="name">expense.tracker.monthly.list</field>
         <field name="model">expense.tracker.monthly</field>
         <field name="arch" type="xml">
-            <list string="Monthly Income &amp; Expense">
+            <list string="Monthly Income &amp; Expense" delete="false">
                 <field name="city_id"/>
                 <field name="manager_id"/>
                 <field name="month"/>
