@@ -36,6 +36,9 @@ class ExpenseTrackerBalanceReport(models.TransientModel):
     counted, anywhere in this report."""
     _name = 'expense.tracker.balance.report'
     _description = 'Category Balance Report (Director)'
+    _rec_name = 'name'
+
+    name = fields.Char(default='Category Balance Report')
 
     def _selection_year(self):
         years = set(self.env['expense.tracker.monthly'].sudo().search([]).mapped('year'))
