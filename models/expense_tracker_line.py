@@ -114,6 +114,15 @@ class ExpenseTrackerLine(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        monthly_ids = {v.get('monthly_id') for v in vals_list if v.get('monthly_id')}
+        if monthly_ids:
+            submitted = self.env['expense.tracker.monthly'].browse(monthly_ids).filtered(
+                lambda m: m.state == 'submitted')
+            if submitted:
+                raise ValidationError(_(
+                    "Can't add entries to a Submitted record (%s). "
+                    "A Director needs to reset it to Draft first."
+                ) % ', '.join(submitted.mapped('name')))
         lines = super().create(vals_list)
         for line in lines:
             if line.monthly_id:
@@ -122,6 +131,11 @@ class ExpenseTrackerLine(models.Model):
         return lines
 
     def write(self, vals):
+        if any(line.monthly_id.state == 'submitted' for line in self):
+            raise ValidationError(_(
+                "Can't edit entries on a Submitted record. "
+                "A Director needs to reset it to Draft first."
+            ))
         changed_fields = [f for f in self.TRACKED_FIELDS if f in vals]
         old_data = {}
         if changed_fields:
@@ -149,6 +163,11 @@ class ExpenseTrackerLine(models.Model):
         return result
 
     def unlink(self):
+        if any(line.monthly_id.state == 'submitted' for line in self):
+            raise ValidationError(_(
+                "Can't delete entries on a Submitted record. "
+                "A Director needs to reset it to Draft first."
+            ))
         summaries = [(line.monthly_id, line._log_summary()) for line in self if line.monthly_id]
         result = super().unlink()
         for monthly, summary in summaries:

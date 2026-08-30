@@ -83,13 +83,15 @@
                     </group>
                     <div class="mb-2">
                         <button name="action_add_line" type="object" string="Add Entry"
-                                class="btn btn-success" icon="fa-plus"/>
+                                class="btn btn-success" icon="fa-plus"
+                                invisible="state == 'submitted'"/>
                         <button name="action_delete_and_redirect" type="object" string="Delete"
                                 class="btn btn-outline-danger ms-2" icon="fa-trash"
                                 invisible="state == 'submitted'"
                                 confirm="Delete this monthly record and all its entries? This cannot be undone."/>
                     </div>
-                    <field name="line_ids" nolabel="1" default_group_by="line_type">
+                    <field name="line_ids" nolabel="1" default_group_by="line_type"
+                           readonly="state == 'submitted'">
                         <list create="0">
                             <field name="sequence" widget="handle"/>
                             <field name="date"/>
