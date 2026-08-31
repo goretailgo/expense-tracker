@@ -155,7 +155,8 @@ class ExpenseTrackerLine(models.Model):
         for line in lines:
             if line.monthly_id:
                 line.monthly_id.message_post(
-                    body=Markup('<b>Entry added:</b> %s') % line._log_summary())
+                    body=Markup('<b>Entry added:</b> %s') % line._log_summary(),
+                    subtype_xmlid='mail.mt_note')
         return lines
 
     def write(self, vals):
@@ -187,7 +188,7 @@ class ExpenseTrackerLine(models.Model):
                 if diff_items and line.monthly_id:
                     body = Markup('<b>Entry updated:</b> %s<ul class="mb-0 ps-3">%s</ul>') % (
                         line._log_summary(), Markup('').join(diff_items))
-                    line.monthly_id.message_post(body=body)
+                    line.monthly_id.message_post(body=body, subtype_xmlid='mail.mt_note')
         return result
 
     def unlink(self):
@@ -199,5 +200,5 @@ class ExpenseTrackerLine(models.Model):
         summaries = [(line.monthly_id, line._log_summary()) for line in self if line.monthly_id]
         result = super().unlink()
         for monthly, summary in summaries:
-            monthly.message_post(body=Markup('<b>Entry removed:</b> %s') % summary)
+            monthly.message_post(body=Markup('<b>Entry removed:</b> %s') % summary, subtype_xmlid='mail.mt_note')
         return result
