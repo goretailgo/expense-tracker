@@ -119,19 +119,6 @@
                         <field name="net_income" class="oe_subtotal_footer_separator"/>
                     </group>
                     <div class="oe_clear"/>
-                    <notebook>
-                        <page string="Activity Log" name="activity_log">
-                            <field name="message_ids" nolabel="1"
-                                   domain="[('subtype_id.internal', '=', True)]"
-                                   options="{'no_open': True}">
-                                <list create="0" edit="0" delete="0" default_order="date desc">
-                                    <field name="date" string="When"/>
-                                    <field name="author_id" string="By"/>
-                                    <field name="body" widget="html"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
                 </sheet>
                 <chatter/>
             </form>
